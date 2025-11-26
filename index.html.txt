@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overdose</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Hiragino Sans GB', 'Microsoft YaHei', 'Meiryo', sans-serif;
+            background: #ffffff; /* 白色背景 */
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid #eee;
+        }
+        
+        .header {
+            background: #808080; /* 灰色背景 */
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .image-container {
+            width: 100%;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .music-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border: 5px solid white;
+        }
+        
+        .player-section {
+            padding: 0 30px 30px;
+        }
+        
+        audio {
+            width: 100%;
+            margin: 20px 0;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            border: none;
+            color: white;
+            padding: 14px 28px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            transition: all 0.3s ease;
+            min-width: 140px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .status-message {
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+        
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+        
+        .loading {
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #bbdefb;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #888;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                border-radius: 15px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .image-container {
+                padding: 20px;
+            }
+            
+            .player-section {
+                padding: 0 20px 20px;
+            }
+            
+            button {
+                min-width: 120px;
+                padding: 12px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Overdose</h1>
+            <div class="subtitle">解像度との悪い夢を見たい</div>
+        </div>
+        
+        <div class="image-container">
+            <!-- 请确保图片文件名与此处一致 -->
+            <img src="https://cdn.jsdelivr.net/gh/MYUJIE05/Overdosear/overdose-image.jpg" alt="Overdose" class="music-image" id="coverImage">
+        </div>
+        
+        <div class="player-section">
+            <div id="statusMessage" class="status-message"></div>
+            
+            <audio id="myAudio" controls preload="auto">
+                <!-- 请确保音乐文件名与此处一致 -->
+                <source src="https://cdn.jsdelivr.net/gh/MYUJIE05/Overdosear/overdose.mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放。
+            </audio>
+            
+            <div class="controls">
+                <button onclick="playAudio()">▶ 播放</button>
+                <button onclick="pauseAudio()">⏸ 暂停</button>
+                <button onclick="testConnection()">📡 检查连接</button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>孟玉傑</p>
+        </div>
+    </div>
+
+    <script>
+        // 多源配置 - 确保稳定性
+        const sources = {
+            github: {
+                name: "GitHub",
+                audio: "https://MYUJIE05.github.io/Overdosear/overdose.mp3",
+                image: "https://MYUJIE05.github.io/Overdosear/overdose-image.jpg"
+            },
+            jsdelivr: {
+                name: "jsDelivr CDN", 
+                audio: "https://cdn.jsdelivr.net/gh/MYUJIE05/Overdosear/overdose.mp3",
+                image: "https://cdn.jsdelivr.net/gh/MYUJIE05/Overdosear/overdose-image.jpg"
+            }
+        };
+
+        let currentSource = 'jsdelivr'; // 默认使用CDN
+        const audio = document.getElementById("myAudio");
+        const statusMessage = document.getElementById("statusMessage");
+        const coverImage = document.getElementById("coverImage");
+
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = "status-message " + type;
+            statusMessage.style.display = 'block';
+        }
+
+        // 测试网络连接
+        function testConnection() {
+            showStatus("正在检查连接...", "loading");
+            
+            var testAudio = new Audio();
+            var timeout = setTimeout(function() {
+                showStatus("连接超时，请检查网络设置", "error");
+            }, 10000);
+            
+            testAudio.addEventListener('canplaythrough', function() {
+                clearTimeout(timeout);
+                showStatus("✓ 连接正常！可以播放音乐", "success");
+                setTimeout(function() {
+                    statusMessage.style.display = 'none';
+                }, 3000);
+            });
+            
+            testAudio.addEventListener('error', function(e) {
+                clearTimeout(timeout);
+                showStatus("✗ 连接失败，请检查网络", "error");
+            });
+            
+            testAudio.src = sources[currentSource].audio + '?t=' + new Date().getTime();
+            testAudio.load();
+        }
+        
+        // 播放音乐
+        function playAudio() {
+            var playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(function() {
+                    showStatus("正在播放...", "success");
+                    setTimeout(function() {
+                        statusMessage.style.display = 'none';
+                    }, 2000);
+                }).catch(function(error) {
+                    showStatus("播放失败，请点击检查连接", "error");
+                });
+            }
+        }
+        
+        // 暂停音乐
+        function pauseAudio() {
+            audio.pause();
+            showStatus("已暂停", "success");
+            setTimeout(function() {
+                statusMessage.style.display = 'none';
+            }, 2000);
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            showStatus("加载中...", "loading");
+            
+            // 检查音频加载状态
+            audio.addEventListener('canplaythrough', function() {
+                showStatus("✓ 音乐加载完成，点击播放按钮", "success");
+                setTimeout(function() {
+                    statusMessage.style.display = 'none';
+                }, 3000);
+            });
+            
+            audio.addEventListener('error', function(e) {
+                showStatus("音乐加载失败，请点击检查连接", "error");
+            });
+            
+            // 图片加载错误处理
+            coverImage.addEventListener('error', function() {
+                document.querySelector('.image-container').innerHTML = 
+                    '<p style="color: #666; padding: 20px;">图片加载失败</p>';
+            });
+            
+            // 添加点击事件以解决iOS自动播放限制
+            document.addEventListener('click', function initAudio() {
+                if (audio.paused) {
+                    audio.muted = true;
+                    var playPromise = audio.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(function() {
+                            audio.pause();
+                            audio.muted = false;
+                        });
+                    }
+                }
+                document.removeEventListener('click', initAudio);
+            });
+        });
+    </script>
+</body>
+</html>
